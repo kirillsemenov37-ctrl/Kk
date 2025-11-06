@@ -1,0 +1,65 @@
+using System;
+
+class Point
+{
+    int x;
+    int y;
+    
+    public void Set(int e, int b)
+    {
+        x = e;
+        y = b;
+    }
+    
+    public int RastoyanieX(Point d)
+    {
+        int z = x - d.x;
+        return Math.Abs(z);
+    }
+    
+    public int RastoyanieY(Point d)
+    {
+        int z = y - d.y;
+        return Math.Abs(z);
+    }
+    
+    public void VivestiKoordinati()
+    {
+        Console.WriteLine($"({x}, {y})");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        // Создаем точки для прямоугольника
+        Point T1 = new Point();
+        Point T2 = new Point();
+        Point T3 = new Point();
+        Point T4 = new Point();
+        
+        // Устанавливаем координаты (пример из картинки)
+        T1.Set(5, 7);    // T1(5,7)
+        T2.Set(20, 13);  // T2(20,13)
+        T3.Set(5, 13);   // T3(5,13)
+        T4.Set(20, 7);   // T4(20,7)
+        
+        // Вычисляем стороны прямоугольника
+        int shirina = T1.RastoyanieX(T2); // 20 - 5 = 15
+        int visota = T1.RastoyanieY(T3);  // 13 - 7 = 6
+        
+        // Вычисляем площадь
+        int ploshad = shirina * visota;
+        
+        // Выводим результаты
+        Console.Write("T1: "); T1.VivestiKoordinati();
+        Console.Write("T2: "); T2.VivestiKoordinati();
+        Console.Write("T3: "); T3.VivestiKoordinati();
+        Console.Write("T4: "); T4.VivestiKoordinati();
+        
+        Console.WriteLine($"Ширина: {T1.RastoyanieX(T2)}");
+        Console.WriteLine($"Высота: {T1.RastoyanieY(T3)}");
+        Console.WriteLine($"Площадь прямоугольника: {ploshad}");
+    }
+}
