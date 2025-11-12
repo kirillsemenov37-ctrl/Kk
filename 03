@@ -1,0 +1,31 @@
+abstract class AudioPlayer {
+    public abstract void Play();
+    public void Stop() {
+        Console.WriteLine("Audio stop");
+    }
+}
+
+abstract class VideoPlayer {
+    public abstract void Show();
+    public void Pause() {
+        Console.WriteLine("Video pause");
+    }
+}
+
+interface IMedia {
+    void Next();
+}
+
+class Universal : AudioPlayer, VideoPlayer, IMedia {
+    public override void Play() {
+        Console.WriteLine("Play music");
+    }
+    
+    public override void Show() {
+        Console.WriteLine("Show video");
+    }
+    
+    public void Next() {
+        Console.WriteLine("Next track");
+    }
+}
