@@ -31,10 +31,26 @@ class Program
     
     static void Main()
     {
-        // Создаем 3 начальных завода
-        factories.Add(new Factory("Завод1", "Город1", 100));
-        factories.Add(new Factory("Завод2", "Город2", 200));
-        factories.Add(new Factory("Завод3", "Город3", 300));
+        // Создаем ОДИН основной завод
+        Factory mainFactory = new Factory("ГлавныйЗавод", "Столица", 500);
+        
+        // Создаем 3 клона от основного завода
+        factories.Add(mainFactory.Clone());
+        factories.Add(mainFactory.Clone());
+        factories.Add(mainFactory.Clone());
+        
+        // Изменяем данные у клонов
+        factories[0].Name = "Завод1";
+        factories[0].Location = "Город1";
+        factories[0].Capacity = 100;
+        
+        factories[1].Name = "Завод2";
+        factories[1].Location = "Город2";
+        factories[1].Capacity = 200;
+        
+        factories[2].Name = "Завод3";
+        factories[2].Location = "Город3";
+        factories[2].Capacity = 300;
         
         while (true)
         {
@@ -56,6 +72,7 @@ class Program
         Console.Write("Мощность: ");
         int capacity = int.Parse(Console.ReadLine());
         
+        // Создаем новый завод (не клон)
         Factory newFactory = new Factory(name, location, capacity);
         factories.Add(newFactory);
         Console.WriteLine("Завод добавлен!");
