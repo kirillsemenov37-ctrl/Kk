@@ -1,0 +1,67 @@
+using System;
+
+class Car
+{
+    public string Color { get; set; }
+    public string Model { get; set; }
+    public int Year { get; set; }
+    
+    public Car(string color, string model, int year)
+    {
+        Color = color;
+        Model = model;
+        Year = year;
+    }
+    
+    // Метод для клонирования
+    public Car Clone()
+    {
+        return new Car(this.Color, this.Model, this.Year);
+    }
+    
+    public void DisplayInfo()
+    {
+        Console.WriteLine($"Автомобиль: {Model} | Цвет: {Color} | Год: {Year}");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("=== СОЗДАНИЕ И КЛОНИРОВАНИЕ АВТОМОБИЛЕЙ ===\n");
+        
+        // Создаем оригинальный автомобиль
+        Car originalCar = new Car("Красный", "Toyota Camry", 2023);
+        Console.WriteLine("Оригинальный автомобиль:");
+        originalCar.DisplayInfo();
+        
+        // Создаем 3 клона
+        Car clone1 = originalCar.Clone();
+        Car clone2 = originalCar.Clone();
+        Car clone3 = originalCar.Clone();
+        
+        // Изменяем свойства клонов
+        clone1.Color = "Синий";
+        clone1.Year = 2024;
+        
+        clone2.Color = "Черный";
+        clone2.Model = "Toyota Corolla";
+        
+        clone3.Color = "Белый";
+        clone3.Year = 2022;
+        clone3.Model = "Toyota RAV4";
+        
+        Console.WriteLine("\nКлон 1 (измененный):");
+        clone1.DisplayInfo();
+        
+        Console.WriteLine("Клон 2 (измененный):");
+        clone2.DisplayInfo();
+        
+        Console.WriteLine("Клон 3 (измененный):");
+        clone3.DisplayInfo();
+        
+        Console.WriteLine("\nОригинал (не изменился):");
+        originalCar.DisplayInfo();
+    }
+}
