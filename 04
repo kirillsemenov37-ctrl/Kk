@@ -1,67 +1,72 @@
 using System;
+using System.Collections.Generic;
 
-class Car
+class Factory
 {
-    public string Color { get; set; }
-    public string Model { get; set; }
-    public int Year { get; set; }
+    public string Name { get; set; }
+    public string Location { get; set; }
+    public int Capacity { get; set; }
     
-    public Car(string color, string model, int year)
+    public Factory(string name, string location, int capacity)
     {
-        Color = color;
-        Model = model;
-        Year = year;
+        Name = name;
+        Location = location;
+        Capacity = capacity;
     }
     
-    // Метод для клонирования
-    public Car Clone()
+    public Factory Clone()
     {
-        return new Car(this.Color, this.Model, this.Year);
+        return new Factory(this.Name, this.Location, this.Capacity);
     }
     
-    public void DisplayInfo()
+    public void Display()
     {
-        Console.WriteLine($"Автомобиль: {Model} | Цвет: {Color} | Год: {Year}");
+        Console.WriteLine($"{Name} - {Location} ({Capacity})");
     }
 }
 
 class Program
 {
+    static List<Factory> factories = new List<Factory>();
+    
     static void Main()
     {
-        Console.WriteLine("=== СОЗДАНИЕ И КЛОНИРОВАНИЕ АВТОМОБИЛЕЙ ===\n");
+        // Создаем 3 начальных завода
+        factories.Add(new Factory("Завод1", "Город1", 100));
+        factories.Add(new Factory("Завод2", "Город2", 200));
+        factories.Add(new Factory("Завод3", "Город3", 300));
         
-        // Создаем оригинальный автомобиль
-        Car originalCar = new Car("Красный", "Toyota Camry", 2023);
-        Console.WriteLine("Оригинальный автомобиль:");
-        originalCar.DisplayInfo();
+        while (true)
+        {
+            Console.WriteLine("\n1 - Добавить завод\n2 - Показать заводы\n3 - Выход");
+            string choice = Console.ReadLine();
+            
+            if (choice == "1") AddFactory();
+            else if (choice == "2") ShowFactories();
+            else if (choice == "3") break;
+        }
+    }
+    
+    static void AddFactory()
+    {
+        Console.Write("Название: ");
+        string name = Console.ReadLine();
+        Console.Write("Местоположение: ");
+        string location = Console.ReadLine();
+        Console.Write("Мощность: ");
+        int capacity = int.Parse(Console.ReadLine());
         
-        // Создаем 3 клона
-        Car clone1 = originalCar.Clone();
-        Car clone2 = originalCar.Clone();
-        Car clone3 = originalCar.Clone();
-        
-        // Изменяем свойства клонов
-        clone1.Color = "Синий";
-        clone1.Year = 2024;
-        
-        clone2.Color = "Черный";
-        clone2.Model = "Toyota Corolla";
-        
-        clone3.Color = "Белый";
-        clone3.Year = 2022;
-        clone3.Model = "Toyota RAV4";
-        
-        Console.WriteLine("\nКлон 1 (измененный):");
-        clone1.DisplayInfo();
-        
-        Console.WriteLine("Клон 2 (измененный):");
-        clone2.DisplayInfo();
-        
-        Console.WriteLine("Клон 3 (измененный):");
-        clone3.DisplayInfo();
-        
-        Console.WriteLine("\nОригинал (не изменился):");
-        originalCar.DisplayInfo();
+        Factory newFactory = new Factory(name, location, capacity);
+        factories.Add(newFactory);
+        Console.WriteLine("Завод добавлен!");
+    }
+    
+    static void ShowFactories()
+    {
+        Console.WriteLine("\nВсе заводы:");
+        foreach (var factory in factories)
+        {
+            factory.Display();
+        }
     }
 }
