@@ -1,0 +1,148 @@
+using System;
+using System.Collections.Generic;
+using System.Xml.Linq;
+using System.Linq;
+
+class Program
+{
+    static string filePath = "books.xml";
+    static List<Book> books = new List<Book>();
+
+    class Book
+    {
+        public int Id;
+        public string Title;
+        public string Author;
+        public int Year;
+        public string Genre;
+    }
+
+    static void Main()
+    {
+        LoadXml();
+
+        while (true)
+        {
+            Console.WriteLine("\n1. Показать книги");
+            Console.WriteLine("2. Добавить книгу");
+            Console.WriteLine("3. Поиск");
+            Console.WriteLine("4. Удалить по ID");
+            Console.WriteLine("5. Выход");
+            Console.Write("Выберите: ");
+
+            switch (Console.ReadLine())
+            {
+                case "1": Show(); break;
+                case "2": Add(); break;
+                case "3": Search(); break;
+                case "4": Delete(); break;
+                case "5": SaveXml(); return;
+                default: Console.WriteLine("Ошибка ввода."); break;
+            }
+        }
+    }
+
+    // Загрузка
+    static void LoadXml()
+    {
+        if (!System.IO.File.Exists(filePath))
+        {
+            new XDocument(new XElement("Library")).Save(filePath);
+        }
+
+        XDocument doc = XDocument.Load(filePath);
+
+        books = doc.Root.Elements("Book")
+            .Select(x => new Book
+            {
+                Id = (int)x.Element("Id"),
+                Title = (string)x.Element("Title"),
+                Author = (string)x.Element("Author"),
+                Year = (int)x.Element("Year"),
+                Genre = (string)x.Element("Genre")
+            }).ToList();
+    }
+
+    // Сохранение
+    static void SaveXml()
+    {
+        XDocument doc = new XDocument(
+            new XElement("Library",
+                books.Select(b =>
+                    new XElement("Book",
+                        new XElement("Id", b.Id),
+                        new XElement("Title", b.Title),
+                        new XElement("Author", b.Author),
+                        new XElement("Year", b.Year),
+                        new XElement("Genre", b.Genre)
+                    )
+                )
+            )
+        );
+
+        doc.Save(filePath);
+    }
+
+    static void Show()
+    {
+        if (books.Count == 0)
+        {
+            Console.WriteLine("Книг нет.");
+            return;
+        }
+
+        foreach (var b in books)
+        {
+            Console.WriteLine($"{b.Id} | {b.Title} | {b.Author} | {b.Year} | {b.Genre}");
+        }
+    }
+
+    static void Add()
+    {
+        Book b = new Book();
+
+        Console.Write("ID: "); b.Id = int.Parse(Console.ReadLine());
+        Console.Write("Название: "); b.Title = Console.ReadLine();
+        Console.Write("Автор: "); b.Author = Console.ReadLine();
+        Console.Write("Год: "); b.Year = int.Parse(Console.ReadLine());
+        Console.Write("Жанр: "); b.Genre = Console.ReadLine();
+
+        books.Add(b);
+        SaveXml();
+
+        Console.WriteLine("Книга добавлена.");
+    }
+
+    static void Search()
+    {
+        Console.Write("Введите автора или жанр: ");
+        string q = Console.ReadLine().ToLower();
+
+        var result = books.Where(b =>
+            b.Author.ToLower().Contains(q) ||
+            b.Genre.ToLower().Contains(q));
+
+        foreach (var b in result)
+        {
+            Console.WriteLine($"{b.Id} | {b.Title} | {b.Author} | {b.Year} | {b.Genre}");
+        }
+    }
+
+    static void Delete()
+    {
+        Console.Write("Введите ID: ");
+        int id = int.Parse(Console.ReadLine());
+
+        var book = books.FirstOrDefault(b => b.Id == id);
+
+        if (book == null)
+        {
+            Console.WriteLine("Не найдено.");
+            return;
+        }
+
+        books.Remove(book);
+        SaveXml();
+        Console.WriteLine("Удалено.");
+    }
+}
