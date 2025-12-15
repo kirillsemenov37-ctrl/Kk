@@ -1,0 +1,145 @@
+using System;
+
+namespace Zoo
+{
+    // 1. БАЗОВЫЙ КЛАСС ЖИВОТНОГО (АБСТРАКТНЫЙ)
+    public abstract class Animal
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+        
+        // Абстрактный метод - должен быть реализован в дочерних классах
+        public abstract void MakeSound();
+        
+        // Общий метод для всех животных
+        public void Eat(string food)
+        {
+            Console.WriteLine($"{Name} ест {food}");
+        }
+        
+        // Виртуальный метод - можно переопределить
+        public virtual void Move()
+        {
+            Console.WriteLine($"{Name} перемещается");
+        }
+    }
+    
+    // 2. ДОЧЕРНИЕ КЛАССЫ ДЛЯ КАТЕГОРИЙ ЖИВОТНЫХ
+    public class Mammal : Animal
+    {
+        public override void MakeSound()
+        {
+            Console.WriteLine($"{Name} издает звук млекопитающего");
+        }
+        
+        public void GiveBirth()
+        {
+            Console.WriteLine($"{Name} рожает детенышей");
+        }
+    }
+    
+    public class Bird : Animal
+    {
+        public override void MakeSound()
+        {
+            Console.WriteLine($"{Name} поет или чирикает");
+        }
+        
+        public void LayEggs()
+        {
+            Console.WriteLine($"{Name} откладывает яйца");
+        }
+        
+        public override void Move()
+        {
+            Console.WriteLine($"{Name} летает");
+        }
+    }
+    
+    // 3. КОНКРЕТНЫЕ ВИДЫ ЖИВОТНЫХ
+    public class Lion : Mammal
+    {
+        public Lion(string name, int age)
+        {
+            Name = name;
+            Age = age;
+        }
+        
+        public override void MakeSound()
+        {
+            Console.WriteLine($"{Name} рычит: Ррррр!");
+        }
+        
+        public void Hunt()
+        {
+            Console.WriteLine($"{Name} охотится");
+        }
+    }
+    
+    public class Eagle : Bird
+    {
+        public Eagle(string name, int age)
+        {
+            Name = name;
+            Age = age;
+        }
+        
+        public override void MakeSound()
+        {
+            Console.WriteLine($"{Name} кричит: Кья-я-я!");
+        }
+    }
+    
+    // 4. КЛАСС СМОТРИТЕЛЯ ЗООПАРКА
+    public class ZooKeeper
+    {
+        public string Name { get; set; }
+        
+        public void FeedAnimal(Animal animal, string food)
+        {
+            Console.WriteLine($"Смотритель {Name} кормит {animal.Name}");
+            animal.Eat(food);
+        }
+        
+        public void MakeAnimalSound(Animal animal)
+        {
+            Console.WriteLine($"Смотритель просит {animal.Name} подать голос:");
+            animal.MakeSound();
+        }
+    }
+    
+    // ПРОГРАММА ДЛЯ ТЕСТИРОВАНИЯ
+    class Program
+    {
+        static void Main()
+        {
+            // Создаем животных
+            Lion lion = new Lion("Симба", 5);
+            Eagle eagle = new Eagle("Орлик", 3);
+            
+            // Создаем смотрителя
+            ZooKeeper keeper = new ZooKeeper();
+            keeper.Name = "Иван";
+            
+            // Работа смотрителя с животными
+            Console.WriteLine("=== Работа зоопарка ===\n");
+            
+            // 1. Кормление животных
+            keeper.FeedAnimal(lion, "мясо");
+            keeper.FeedAnimal(eagle, "рыбу");
+            
+            Console.WriteLine();
+            
+            // 2. Звуки животных
+            keeper.MakeAnimalSound(lion);
+            keeper.MakeAnimalSound(eagle);
+            
+            Console.WriteLine();
+            
+            // 3. Уникальное поведение
+            lion.Hunt();          // Метод только у льва
+            eagle.LayEggs();      // Метод только у птиц
+            lion.GiveBirth();     // Метод только у млекопитающих
+        }
+    }
+}
