@@ -1,0 +1,91 @@
+using System;
+
+public abstract class Subscription
+{
+    // Закрытые (private) поля - соответствует "Закрытые (private) поля"
+    private decimal _basePrice;
+    private int _durationInMonths;
+
+    // Защищённые (protected) свойства для чтения - соответствует "Защищённые свойства для чтения"
+    protected decimal BasePrice => _basePrice;
+    protected int DurationInMonths => _durationInMonths;
+
+    // Конструктор для инициализации - соответствует "Конструктор для инициализации всех полей"
+    // Валидация внутри - соответствует "Валидация входных данных должна быть скрыта внутри классов"
+    protected Subscription(decimal basePrice, int durationInMonths)
+    {
+        if (basePrice <= 0)
+            throw new ArgumentException("Цена должна быть больше 0", nameof(basePrice));
+        
+        if (durationInMonths <= 0)
+            throw new ArgumentException("Длительность должна быть больше 0", nameof(durationInMonths));
+
+        _basePrice = basePrice;
+        _durationInMonths = durationInMonths;
+    }
+
+    // Абстрактный метод - соответствует "Абстрактный метод: decimal CalculatePrice()"
+    public abstract decimal CalculatePrice();
+    
+    // Виртуальный метод - соответствует "Виртуальный метод: string GetDescription()"
+    public virtual string GetDescription()
+    {
+        return $"Подписка на {DurationInMonths} месяцев";
+    }
+}
+// BasicSubscription - соответствует "Не содержит дополнительных скидок или надбавок"
+public class BasicSubscription : Subscription
+{
+    public BasicSubscription(decimal basePrice, int durationInMonths) 
+        : base(basePrice, durationInMonths) { }
+
+    public override decimal CalculatePrice()
+    {
+        return BasePrice * DurationInMonths; // Базовая стоимость без изменений
+    }
+
+    public override string GetDescription()
+    {
+        return $"Базовая подписка. {base.GetDescription()}";
+    }
+}
+
+// StudentSubscription - соответствует "Предоставляет скидку 50% на итоговую стоимость"
+public class StudentSubscription : Subscription
+{
+    private const decimal DISCOUNT = 0.5m; // 50% скидка
+
+    public StudentSubscription(decimal basePrice, int durationInMonths) 
+        : base(basePrice, durationInMonths) { }
+
+    public override decimal CalculatePrice()
+    {
+        decimal baseCost = BasePrice * DurationInMonths;
+        return baseCost * (1 - DISCOUNT); // Применяем скидку 50%
+    }
+
+    public override string GetDescription()
+    {
+        return $"Студенческая подписка (скидка 50%). {base.GetDescription()}";
+    }
+}
+
+// PremiumSubscription - третий обязательный тип
+public class PremiumSubscription : Subscription
+{
+    private const decimal PREMIUM_MULTIPLIER = 1.5m; // Надбавка 50%
+
+    public PremiumSubscription(decimal basePrice, int durationInMonths) 
+        : base(basePrice, durationInMonths) { }
+
+    public override decimal CalculatePrice()
+    {
+        decimal baseCost = BasePrice * DurationInMonths;
+        return baseCost * PREMIUM_MULTIPLIER; // Премиум дороже
+    }
+
+    public override string GetDescription()
+    {
+        return $"Премиум подписка (расширенные возможности). {base.GetDescription()}";
+    }
+}
