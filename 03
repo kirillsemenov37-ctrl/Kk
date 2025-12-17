@@ -1,31 +1,67 @@
-abstract class AudioPlayer {
-    public abstract void Play();
-    public void Stop() {
-        Console.WriteLine("Audio stop");
+using System;
+using System.Collections.Generic;
+
+public interface INotification
+{
+    void Send(string message);
+    string GetInfo();
+}
+
+public abstract class NotificationBase : INotification
+{
+    protected string Recipient;
+
+    protected NotificationBase(string recipient)
+    {
+        Recipient = recipient;
+    }
+
+    public string GetInfo()
+    {
+        return $"Отправка уведомления получателю: {Recipient}";
+    }
+
+    public abstract void Send(string message);
+}
+
+public class EmailNotification : NotificationBase
+{
+    public EmailNotification(string recipient) : base(recipient)
+    {
+    }
+
+    public override void Send(string message)
+    {
+        Console.WriteLine($"Email отправлен на {Recipient}: {message}");
     }
 }
 
-abstract class VideoPlayer {
-    public abstract void Show();
-    public void Pause() {
-        Console.WriteLine("Video pause");
+public class SmsNotification : NotificationBase
+{
+    public SmsNotification(string recipient) : base(recipient)
+    {
+    }
+
+    public override void Send(string message)
+    {
+        Console.WriteLine($"SMS отправлено на {Recipient}: {message}");
     }
 }
 
-interface IMedia {
-    void Next();
-}
+class Program
+{
+    static void Main(string[] args)
+    {
+        List<INotification> notifications = new List<INotification>
+        {
+            new EmailNotification("test@mail.com"),
+            new SmsNotification("+79991234567")
+        };
 
-class Universal : AudioPlayer, VideoPlayer, IMedia {
-    public override void Play() {
-        Console.WriteLine("Play music");
-    }
-    
-    public override void Show() {
-        Console.WriteLine("Show video");
-    }
-    
-    public void Next() {
-        Console.WriteLine("Next track");
+        foreach (var notification in notifications)
+        {
+            Console.WriteLine(notification.GetInfo());
+            notification.Send("Ваш код подтверждения: 1234");
+        }
     }
 }
