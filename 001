@@ -2,16 +2,14 @@ using System;
 
 public abstract class Subscription
 {
-    // Закрытые (private) поля - соответствует "Закрытые (private) поля"
     private decimal _basePrice;
     private int _durationInMonths;
 
-    // Защищённые (protected) свойства для чтения - соответствует "Защищённые свойства для чтения"
+   
     protected decimal BasePrice => _basePrice;
     protected int DurationInMonths => _durationInMonths;
 
-    // Конструктор для инициализации - соответствует "Конструктор для инициализации всех полей"
-    // Валидация внутри - соответствует "Валидация входных данных должна быть скрыта внутри классов"
+  
     protected Subscription(decimal basePrice, int durationInMonths)
     {
         if (basePrice <= 0)
@@ -24,16 +22,16 @@ public abstract class Subscription
         _durationInMonths = durationInMonths;
     }
 
-    // Абстрактный метод - соответствует "Абстрактный метод: decimal CalculatePrice()"
+    
     public abstract decimal CalculatePrice();
     
-    // Виртуальный метод - соответствует "Виртуальный метод: string GetDescription()"
+    
     public virtual string GetDescription()
     {
         return $"Подписка на {DurationInMonths} месяцев";
     }
 }
-// BasicSubscription - соответствует "Не содержит дополнительных скидок или надбавок"
+
 public class BasicSubscription : Subscription
 {
     public BasicSubscription(decimal basePrice, int durationInMonths) 
@@ -41,7 +39,7 @@ public class BasicSubscription : Subscription
 
     public override decimal CalculatePrice()
     {
-        return BasePrice * DurationInMonths; // Базовая стоимость без изменений
+        return BasePrice * DurationInMonths; 
     }
 
     public override string GetDescription()
@@ -50,10 +48,10 @@ public class BasicSubscription : Subscription
     }
 }
 
-// StudentSubscription - соответствует "Предоставляет скидку 50% на итоговую стоимость"
+
 public class StudentSubscription : Subscription
 {
-    private const decimal DISCOUNT = 0.5m; // 50% скидка
+    private const decimal DISCOUNT = 0.5m; 
 
     public StudentSubscription(decimal basePrice, int durationInMonths) 
         : base(basePrice, durationInMonths) { }
@@ -61,7 +59,7 @@ public class StudentSubscription : Subscription
     public override decimal CalculatePrice()
     {
         decimal baseCost = BasePrice * DurationInMonths;
-        return baseCost * (1 - DISCOUNT); // Применяем скидку 50%
+        return baseCost * (1 - DISCOUNT); 
     }
 
     public override string GetDescription()
@@ -70,10 +68,10 @@ public class StudentSubscription : Subscription
     }
 }
 
-// PremiumSubscription - третий обязательный тип
+
 public class PremiumSubscription : Subscription
 {
-    private const decimal PREMIUM_MULTIPLIER = 1.5m; // Надбавка 50%
+    private const decimal PREMIUM_MULTIPLIER = 1.5m;
 
     public PremiumSubscription(decimal basePrice, int durationInMonths) 
         : base(basePrice, durationInMonths) { }
@@ -81,8 +79,8 @@ public class PremiumSubscription : Subscription
     public override decimal CalculatePrice()
     {
         decimal baseCost = BasePrice * DurationInMonths;
-        return baseCost * PREMIUM_MULTIPLIER; // Премиум дороже
-    }
+        return baseCost * PREMIUM_MULTIPLIER; 
+   
 
     public override string GetDescription()
     {
