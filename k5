@@ -27,16 +27,32 @@ class User
 
     static void Main()
     {
-        User u = new User
-        {
-            Name = "",
-            Age = 17,
-            Email = "email",
-            Phone = "123",
-            Password = "12345",
-            ConfirmPassword = "123",
-            Address = "Коротко"
-        };
+        User u = new User();
+
+        Console.WriteLine("=== Ввод данных пользователя ===");
+        
+        Console.Write("Имя: ");
+        u.Name = Console.ReadLine();
+        
+        Console.Write("Возраст: ");
+        u.Age = int.Parse(Console.ReadLine());
+        
+        Console.Write("Email: ");
+        u.Email = Console.ReadLine();
+        
+        Console.Write("Телефон: ");
+        u.Phone = Console.ReadLine();
+        
+        Console.Write("Пароль: ");
+        u.Password = Console.ReadLine();
+        
+        Console.Write("Подтвердите пароль: ");
+        u.ConfirmPassword = Console.ReadLine();
+        
+        Console.Write("Адрес: ");
+        u.Address = Console.ReadLine();
+
+        Console.WriteLine("\n=== Проверка данных ===");
 
         var errors = new List<ValidationResult>();
         var context = new ValidationContext(u);
@@ -45,9 +61,13 @@ class User
 
         if (!ok)
         {
-            Console.WriteLine("Ошибки:");
+            Console.WriteLine("Найдены ошибки:");
             foreach (var e in errors)
-                Console.WriteLine(e.ErrorMessage);
+                Console.WriteLine($"- {e.ErrorMessage}");
+        }
+        else
+        {
+            Console.WriteLine("Все данные введены правильно!");
         }
     }
 }
