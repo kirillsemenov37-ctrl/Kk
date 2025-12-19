@@ -1,167 +1,53 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
+using System.ComponentModel.DataAnnotations;
 
-class Book
+class User
 {
-    public int Id { get; set; }
-    public string Title { get; set; }
-    public string Author { get; set; }
-    public int Year { get; set; }
-    public string Genre { get; set; }
-}
+    [Required(ErrorMessage = "Введите имя")]
+    public string Name { get; set; }
 
-class Library
-{
-    private const string FilePath = "books.xml";
-    private List<Book> books = new List<Book>();
+    [Range(18, 100, ErrorMessage = "Возраст от 18 до 100")]
+    public int Age { get; set; }
 
-    public Library()
-    {
-        LoadFromXml();
-    }
+    [EmailAddress(ErrorMessage = "Неверный формат email")]
+    public string Email { get; set; }
 
-    // Загрузка XML
-    private void LoadFromXml()
-    {
-        if (!System.IO.File.Exists(FilePath))
-        {
-            Console.WriteLine("XML-файл не найден, создаю новый.");
-            new XDocument(new XElement("Library")).Save(FilePath);
-        }
+    [Phone(ErrorMessage = "Неверный формат телефона")]
+    public string Phone { get; set; }
 
-        XDocument doc = XDocument.Load(FilePath);
+    [StringLength(20, MinimumLength = 6, ErrorMessage = "Пароль 6-20 символов")]
+    public string Password { get; set; }
 
-        books = doc.Root.Elements("Book")
-            .Select(b => new Book
-            {
-                Id = (int)b.Element("Id"),
-                Title = (string)b.Element("Title"),
-                Author = (string)b.Element("Author"),
-                Year = (int)b.Element("Year"),
-                Genre = (string)b.Element("Genre")
-            }).ToList();
-    }
+    [Compare("Password", ErrorMessage = "Пароли не совпадают")]
+    public string ConfirmPassword { get; set; }
 
-    // Сохранение XML
-    public void SaveToXml()
-    {
-        XDocument doc = new XDocument(
-            new XElement("Library",
-                books.Select(b =>
-                    new XElement("Book",
-                        new XElement("Id", b.Id),
-                        new XElement("Title", b.Title),
-                        new XElement("Author", b.Author),
-                        new XElement("Year", b.Year),
-                        new XElement("Genre", b.Genre)
-                    )
-                )
-            )
-        );
+    [StringLength(100, MinimumLength = 10, ErrorMessage = "Адрес 10-100 символов")]
+    public string Address { get; set; }
 
-        doc.Save(FilePath);
-    }
-
-    public void ShowBooks()
-    {
-        if (!books.Any())
-        {
-            Console.WriteLine("Нет книг.");
-            return;
-        }
-
-        foreach (var b in books)
-        {
-            Console.WriteLine($"ID: {b.Id}\nНазвание: {b.Title}\nАвтор: {b.Author}\nГод: {b.Year}\nЖанр: {b.Genre}\n---");
-        }
-    }
-
-    public void AddBook()
-    {
-        Book b = new Book();
-
-        Console.Write("Введите ID: ");
-        b.Id = int.Parse(Console.ReadLine());
-
-        Console.Write("Введите название: ");
-        b.Title = Console.ReadLine();
-
-        Console.Write("Введите автора: ");
-        b.Author = Console.ReadLine();
-
-        Console.Write("Введите год: ");
-        b.Year = int.Parse(Console.ReadLine());
-
-        Console.Write("Введите жанр: ");
-        b.Genre = Console.ReadLine();
-
-        books.Add(b);
-        SaveToXml();
-        Console.WriteLine("Книга добавлена.");
-    }
-
-    public void Search()
-    {
-        Console.Write("Введите автора или жанр для поиска: ");
-        string query = Console.ReadLine().ToLower();
-
-        var result = books.Where(b =>
-            b.Author.ToLower().Contains(query) ||
-            b.Genre.ToLower().Contains(query));
-
-        foreach (var b in result)
-        {
-            Console.WriteLine($"{b.Id} | {b.Title} | {b.Author} | {b.Year} | {b.Genre}");
-        }
-    }
-
-    public void Delete()
-    {
-        Console.Write("Введите ID книги для удаления: ");
-        int id = int.Parse(Console.ReadLine());
-
-        var book = books.FirstOrDefault(x => x.Id == id);
-        if (book == null)
-        {
-            Console.WriteLine("Книга не найдена.");
-            return;
-        }
-
-        books.Remove(book);
-        SaveToXml();
-
-        Console.WriteLine("Книга удалена.");
-    }
-}
-
-class Program
-{
     static void Main()
     {
-        Library library = new Library();
-
-        while (true)
+        User u = new User
         {
-            Console.WriteLine("\n1. Просмотр книг");
-            Console.WriteLine("2. Добавить книгу");
-            Console.WriteLine("3. Поиск");
-            Console.WriteLine("4. Удалить по ID");
-            Console.WriteLine("5. Выход");
-            Console.Write("Выберите действие: ");
+            Name = "",
+            Age = 17,
+            Email = "email",
+            Phone = "123",
+            Password = "12345",
+            ConfirmPassword = "123",
+            Address = "Коротко"
+        };
 
-            string choice = Console.ReadLine();
+        var errors = new List<ValidationResult>();
+        var context = new ValidationContext(u);
+        
+        bool ok = Validator.TryValidateObject(u, context, errors, true);
 
-            switch (choice)
-            {
-                case "1": library.ShowBooks(); break;
-                case "2": library.AddBook(); break;
-                case "3": library.Search(); break;
-                case "4": library.Delete(); break;
-                case "5": return;
-                default: Console.WriteLine("Неверный ввод."); break;
-            }
+        if (!ok)
+        {
+            Console.WriteLine("Ошибки:");
+            foreach (var e in errors)
+                Console.WriteLine(e.ErrorMessage);
         }
     }
 }
