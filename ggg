@@ -1,0 +1,131 @@
+using System;
+
+class Node
+{
+    public int Value;
+    public Node Left;
+    public Node Right;
+    public int Height;
+
+    public Node(int value)
+    {
+        Value = value;
+        Height = 1;
+    }
+}
+
+class AvlTree
+{
+    public Node Root;
+
+    int Height(Node n) => n?.Height ?? 0;
+    int Balance(Node n) => n == null ? 0 : Height(n.Left) - Height(n.Right);
+
+    Node RotateRight(Node y)
+    {
+        Node x = y.Left;
+        Node t2 = x.Right;
+
+        x.Right = y;
+        y.Left = t2;
+
+        y.Height = Math.Max(Height(y.Left), Height(y.Right)) + 1;
+        x.Height = Math.Max(Height(x.Left), Height(x.Right)) + 1;
+
+        return x;
+    }
+
+    Node RotateLeft(Node x)
+    {
+        Node y = x.Right;
+        Node t2 = y.Left;
+
+        y.Left = x;
+        x.Right = t2;
+
+        x.Height = Math.Max(Height(x.Left), Height(x.Right)) + 1;
+        y.Height = Math.Max(Height(y.Left), Height(y.Right)) + 1;
+
+        return y;
+    }
+
+    public Node Insert(Node node, int value)
+    {
+        if (node == null)
+            return new Node(value);
+
+        if (value < node.Value)
+            node.Left = Insert(node.Left, value);
+        else if (value > node.Value)
+            node.Right = Insert(node.Right, value);
+        else
+            return node;
+
+        node.Height = 1 + Math.Max(Height(node.Left), Height(node.Right));
+        int balance = Balance(node);
+
+        if (balance > 1 && value < node.Left.Value)
+            return RotateRight(node);
+
+        if (balance < -1 && value > node.Right.Value)
+            return RotateLeft(node);
+
+        if (balance > 1 && value > node.Left.Value)
+        {
+            node.Left = RotateLeft(node.Left);
+            return RotateRight(node);
+        }
+
+        if (balance < -1 && value < node.Right.Value)
+        {
+            node.Right = RotateRight(node.Right);
+            return RotateLeft(node);
+        }
+
+        return node;
+    }
+
+    public void Insert(int value)
+    {
+        Root = Insert(Root, value);
+    }
+}
+
+class Program
+{
+    static void Print(Node node, string indent = "", bool last = true)
+    {
+        if (node == null) return;
+
+        Console.Write(indent);
+        Console.Write(last ? "└─" : "├─");
+        Console.WriteLine($"{node.Value} (h={node.Height}, b={Balance(node)})");
+
+        indent += last ? "  " : "| ";
+
+        Print(node.Left, indent, false);
+        Print(node.Right, indent, true);
+    }
+
+    static int Balance(Node n)
+    {
+        int hl = n?.Left?.Height ?? 0;
+        int hr = n?.Right?.Height ?? 0;
+        return hl - hr;
+    }
+
+    static void Main()
+    {
+        var tree = new AvlTree();
+        int[] values = { 13, 28, 21, 100, 70, 68, 10, 34, 83 };
+
+        foreach (var v in values)
+        {
+            Console.WriteLine($"\nInsert {v}");
+            tree.Insert(v);
+        }
+
+        Console.WriteLine("\nAVL tree:");
+        Print(tree.Root);
+    }
+}
