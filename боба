@@ -1,46 +1,37 @@
-
-public interface IEmailNotificationService
+public interface INotificationService
 {
-    void SendEmail(string email, string message);
+    void Send(string recipient, string message);
 }
 
-public interface ISmsNotificationService
-{
-    void SendSms(string phone, string message);
-}
-
-public interface IPushNotificationService
-{
-    void SendPush(string deviceId, string message);
-}
-
-public abstract class NotificationService
+public abstract class NotificationService : INotificationService
 {
     protected void Log(string text)
     {
         Console.WriteLine(text);
     }
+
+    public abstract void Send(string recipient, string message);
 }
 
-public class EmailNotificationService : NotificationService, IEmailNotificationService
+public class EmailNotificationService : NotificationService
 {
-    public void SendEmail(string email, string message)
+    public override void Send(string email, string message)
     {
         Log($"Email sent to {email}: {message}");
     }
 }
 
-public class SmsNotificationService : NotificationService, ISmsNotificationService
+public class SmsNotificationService : NotificationService
 {
-    public void SendSms(string phone, string message)
+    public override void Send(string phone, string message)
     {
         Log($"SMS sent to {phone}: {message}");
     }
 }
 
-public class PushNotificationService : NotificationService, IPushNotificationService
+public class PushNotificationService : NotificationService
 {
-    public void SendPush(string deviceId, string message)
+    public override void Send(string deviceId, string message)
     {
         Log($"Push sent to {deviceId}: {message}");
     }
