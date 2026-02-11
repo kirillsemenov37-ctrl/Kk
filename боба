@@ -1,0 +1,47 @@
+
+public interface IEmailNotificationService
+{
+    void SendEmail(string email, string message);
+}
+
+public interface ISmsNotificationService
+{
+    void SendSms(string phone, string message);
+}
+
+public interface IPushNotificationService
+{
+    void SendPush(string deviceId, string message);
+}
+
+public abstract class NotificationService
+{
+    protected void Log(string text)
+    {
+        Console.WriteLine(text);
+    }
+}
+
+public class EmailNotificationService : NotificationService, IEmailNotificationService
+{
+    public void SendEmail(string email, string message)
+    {
+        Log($"Email sent to {email}: {message}");
+    }
+}
+
+public class SmsNotificationService : NotificationService, ISmsNotificationService
+{
+    public void SendSms(string phone, string message)
+    {
+        Log($"SMS sent to {phone}: {message}");
+    }
+}
+
+public class PushNotificationService : NotificationService, IPushNotificationService
+{
+    public void SendPush(string deviceId, string message)
+    {
+        Log($"Push sent to {deviceId}: {message}");
+    }
+}
