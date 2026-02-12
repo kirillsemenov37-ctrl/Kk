@@ -1,0 +1,162 @@
+1
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+2
+import jakarta.persistence.*;
+
+@Entity
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private double price;
+
+    public Product() {}
+
+    public Product(String name, double price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    // getters / setters
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+}
+3
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProductRepository extends JpaRepository<Product, Long> {
+}
+4
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/products")
+@CrossOrigin(origins = "http://localhost:3000")
+public class ProductController {
+
+    private final ProductRepository repository;
+
+    public ProductController(ProductRepository repository) {
+        this.repository = repository;
+    }
+
+    @GetMapping
+    public List<Product> getAll() {
+        return repository.findAll();
+    }
+
+    @PostMapping
+    public Product create(@RequestBody Product product) {
+        return repository.save(product);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        repository.deleteById(id);
+    }
+}
+5
+import { useState, useEffect } from "react";
+import axios from "axios";
+
+function App() {
+
+  const [products, setProducts] = useState([]);
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+
+  const API_URL = "http://localhost:8080/products";
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const loadProducts = () => {
+    axios.get(API_URL)
+      .then(response => {
+        setProducts(response.data);
+      });
+  };
+
+  const addProduct = () => {
+    if (name === "" || price === "") return;
+
+    axios.post(API_URL, {
+      name: name,
+      price: parseFloat(price)
+    }).then(() => {
+      setName("");
+      setPrice("");
+      loadProducts();
+    });
+  };
+
+  const deleteProduct = (id) => {
+    axios.delete(API_URL + "/" + id)
+      .then(() => loadProducts());
+  };
+
+  return (
+    <div>
+      <h1>Product Manager</h1>
+
+      <input
+        placeholder="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+
+      <input
+        placeholder="Price"
+        type="number"
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+      />
+
+      <button onClick={addProduct}>Add</button>
+
+      <hr/>
+
+      <ul>
+        {products.map(product => (
+          <li key={product.id}>
+            {product.name} - {product.price}
+            <button onClick={() => deleteProduct(product.id)}>
+              X
+            </button>
+          </li>
+        ))}
+      </ul>
+
+    </div>
+  );
+}
+
+export default App;
