@@ -1,89 +1,105 @@
 using System;
+using System.Globalization;
+using System.Threading;
 
-public abstract class Subscription
+class DiscriminantCalculator
 {
-    private decimal _basePrice;
-    private int _durationInMonths;
-
-   
-    protected decimal BasePrice => _basePrice;
-    protected int DurationInMonths => _durationInMonths;
-
-  
-    protected Subscription(decimal basePrice, int durationInMonths)
+    // Кастомное исключение для таймаута (если нужно симулировать)
+    public class CalculationTimeoutException : Exception
     {
-        if (basePrice <= 0)
-            throw new ArgumentException("Цена должна быть больше 0", nameof(basePrice));
+        public CalculationTimeoutException(string message) : base(message) { }
+    }
+
+    /// <summary>
+    /// Вычисляет дискриминант квадратного уравнения: b² - 4ac
+    /// </summary>
+    public static void CalculateDiscriminant()
+    {
+        try
+        {
+            Console.WriteLine("=== Вычисление дискриминанта (D = b² - 4ac) ===");
+            
+            // Ввод коэффициентов с проверкой формата
+            Console.Write("Введите a: ");
+            double a = ParseInput(Console.ReadLine());
+            
+            Console.Write("Введите b: ");
+            double b = ParseInput(Console.ReadLine());
+            
+            Console.Write("Введите c: ");
+            double c = ParseInput(Console.ReadLine());
+
+            // Проверка деления на 0 (если a=0, это не квадратное уравнение)
+            if (Math.Abs(a) < 0.0001)
+            {
+                throw new DivideByZeroException("Коэффициент 'a' не может быть равен 0 (это не квадратное уравнение)");
+            }
+
+            // Симуляция долгого вычисления (для демонстрации таймаута)
+            Console.WriteLine("Вычисление...");
+            SimulateTimeoutIfNeeded();
+
+            // Вычисление дискриминанта
+            double discriminant = b * b - 4 * a * c;
+            
+            Console.WriteLine($"\n✅ Дискриминант D = {discriminant:F2}");
+            
+            if (discriminant > 0)
+                Console.WriteLine("Два различных корня");
+            else if (discriminant == 0)
+                Console.WriteLine("Один корень (кратность 2)");
+            else
+                Console.WriteLine("Нет действительных корней");
+        }
+        catch (FormatException ex)
+        {
+            Console.WriteLine($"❌ Ошибка формата данных: {ex.Message}");
+            Console.WriteLine("Введите корректное число (например: 3,5 или -2)");
+        }
+        catch (DivideByZeroException ex)
+        {
+            Console.WriteLine($"❌ Ошибка деления: {ex.Message}");
+        }
+        catch (CalculationTimeoutException ex)
+        {
+            Console.WriteLine($"❌ Превышено время ожидания: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Неизвестная ошибка: {ex.Message}");
+        }
+        finally
+        {
+            Console.WriteLine("\n--- Операция завершена ---");
+        }
+    }
+
+    // Парсинг ввода с проверкой формата
+    private static double ParseInput(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            throw new FormatException("Пустой ввод");
+
+        // Заменяем точку на запятую для корректного парсинга в русской локали
+        input = input.Replace('.', ',');
         
-        if (durationInMonths <= 0)
-            throw new ArgumentException("Длительность должна быть больше 0", nameof(durationInMonths));
+        if (!double.TryParse(input, out double result))
+            throw new FormatException($"Невозможно преобразовать '{input}' в число");
 
-        _basePrice = basePrice;
-        _durationInMonths = durationInMonths;
+        return result;
     }
 
-    
-    public abstract decimal CalculatePrice();
-    
-    
-    public virtual string GetDescription()
+    // Симуляция таймаута (для демонстрации)
+    private static void SimulateTimeoutIfNeeded()
     {
-        return $"Подписка на {DurationInMonths} месяцев";
-    }
-}
-
-public class BasicSubscription : Subscription
-{
-    public BasicSubscription(decimal basePrice, int durationInMonths) 
-        : base(basePrice, durationInMonths) { }
-
-    public override decimal CalculatePrice()
-    {
-        return BasePrice * DurationInMonths; 
+        // Раскомментируйте для проверки таймаута:
+        // Thread.Sleep(6000);
+        // throw new CalculationTimeoutException("Вычисление заняло слишком много времени");
     }
 
-    public override string GetDescription()
+    static void Main(string[] args)
     {
-        return $"Базовая подписка. {base.GetDescription()}";
+        CalculateDiscriminant();
     }
 }
 
-
-public class StudentSubscription : Subscription
-{
-    private const decimal DISCOUNT = 0.5m; 
-
-    public StudentSubscription(decimal basePrice, int durationInMonths) 
-        : base(basePrice, durationInMonths) { }
-
-    public override decimal CalculatePrice()
-    {
-        decimal baseCost = BasePrice * DurationInMonths;
-        return baseCost * (1 - DISCOUNT); 
-    }
-
-    public override string GetDescription()
-    {
-        return $"Студенческая подписка (скидка 50%). {base.GetDescription()}";
-    }
-}
-
-
-public class PremiumSubscription : Subscription
-{
-    private const decimal PREMIUM_MULTIPLIER = 1.5m;
-
-    public PremiumSubscription(decimal basePrice, int durationInMonths) 
-        : base(basePrice, durationInMonths) { }
-
-    public override decimal CalculatePrice()
-    {
-        decimal baseCost = BasePrice * DurationInMonths;
-        return baseCost * PREMIUM_MULTIPLIER; 
-   
-
-    public override string GetDescription()
-    {
-        return $"Премиум подписка (расширенные возможности). {base.GetDescription()}";
-    }
-}
