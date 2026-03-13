@@ -1,67 +1,124 @@
-using System;
-using System.Collections.Generic;
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+   <meta charset="UTF-8">
+   <title>Валидация анкеты</title>
+   <style>
+       body { font-family: Arial; max-width: 400px; margin: 50px auto; padding: 20px; }
+       .form-group { margin-bottom: 15px; }
+       label { display: block; margin-bottom: 5px; font-weight: bold; }
+       input { width: 100%; padding: 8px; border: 1px solid #ccc; }
+       input.error { border-color: red; background: #ffe6e6; }
+       .error-text { color: red; font-size: 12px; display: none; }
+       button { width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+       button:hover { background: #45a049; }
+       .success { color: green; text-align: center; margin-top: 20px; display: none; }
+   </style>
+</head>
+<body>
+   <h2>Регистрация</h2>
+   <form id="form">
+       <div class="form-group">
+           <label>Имя (только буквы, мин 2 символа)</label>
+           <input type="text" id="name">
+           <div class="error-text" id="nameError">Неверное имя</div>
+       </div>
+       
+       <div class="form-group">
+           <label>Email</label>
+           <input type="text" id="email">
+           <div class="error-text" id="emailError">Неверный email</div>
+       </div>
+       
+       <div class="form-group">
+           <label>Возраст (18-100)</label>
+           <input type="number" id="age">
+           <div class="error-text" id="ageError">Должно быть от 18 до 100</div>
+       </div>
+       
+       <div class="form-group">
+           <label>Пароль (мин 6 символов, не "password" или "123456")</label>
+           <input type="password" id="password">
+           <div class="error-text" id="passwordError">Неверный пароль</div>
+       </div>
+       
+       <button type="submit">Отправить</button>
+       <div class="success" id="success">✓ Анкета принята!</div>
+   </form>
 
-public interface INotification
-{
-    void Send(string message);
-    string GetInfo();
-}
-
-public abstract class NotificationBase : INotification
-{
-    protected string Recipient;
-
-    protected NotificationBase(string recipient)
-    {
-        Recipient = recipient;
-    }
-
-    public string GetInfo()
-    {
-        return $"Отправка уведомления получателю: {Recipient}";
-    }
-
-    public abstract void Send(string message);
-}
-
-public class EmailNotification : NotificationBase
-{
-    public EmailNotification(string recipient) : base(recipient)
-    {
-    }
-
-    public override void Send(string message)
-    {
-        Console.WriteLine($"Email отправлен на {Recipient}: {message}");
-    }
-}
-
-public class SmsNotification : NotificationBase
-{
-    public SmsNotification(string recipient) : base(recipient)
-    {
-    }
-
-    public override void Send(string message)
-    {
-        Console.WriteLine($"SMS отправлено на {Recipient}: {message}");
-    }
-}
-
-class Program
-{
-    static void Main(string[] args)
-    {
-        List<INotification> notifications = new List<INotification>
-        {
-            new EmailNotification("test@mail.com"),
-            new SmsNotification("+79991234567")
-        };
-
-        foreach (var notification in notifications)
-        {
-            Console.WriteLine(notification.GetInfo());
-            notification.Send("Ваш код подтверждения: 1234");
-        }
-    }
-}
+   <script>
+       // Запрещенные слова
+       const forbidden = ['password', '123456', 'qwerty'];
+       
+       // Проверка полей
+       function validate() {
+           let valid = true;
+           
+           // Имя
+           const name = document.getElementById('name').value;
+           if (!/^[a-zA-Zа-яА-Я]{2,}$/.test(name)) {
+               showError('name', true);
+               valid = false;
+           } else {
+               showError('name', false);
+           }
+           
+           // Email
+           const email = document.getElementById('email').value;
+           if (!email.includes('@') || !email.includes('.')) {
+               showError('email', true);
+               valid = false;
+           } else {
+               showError('email', false);
+           }
+           
+           // Возраст
+           const age = parseInt(document.getElementById('age').value);
+           if (isNaN(age) || age < 18 || age > 100) {
+               showError('age', true);
+               valid = false;
+           } else {
+               showError('age', false);
+           }
+           
+           // Пароль + проверка запрещенных слов
+           const password = document.getElementById('password').value;
+           let passError = password.length < 6;
+           
+           // Проверка на запрещенные данные
+           for (let word of forbidden) {
+               if (password.toLowerCase().includes(word)) {
+                   passError = true;
+                   alert('Ошибка: пароль содержит запрещенное слово "' + word + '"');
+                   break;
+               }
+           }
+           
+           if (passError) {
+               showError('password', true);
+               valid = false;
+           } else {
+               showError('password', false);
+           }
+           
+           return valid;
+       }
+       
+       // Показ/скрытие ошибки
+       function showError(field, show) {
+           document.getElementById(field).classList.toggle('error', show);
+           document.getElementById(field + 'Error').style.display = show ? 'block' : 'none';
+       }
+       
+       // Отправка формы
+       document.getElementById('form').onsubmit = function(e) {
+           e.preventDefault();
+           if (validate()) {
+               document.getElementById('success').style.display = 'block';
+               this.reset();
+               setTimeout(() => document.getElementById('success').style.display = 'none', 3000);
+           }
+       };
+   </script>
+</body>
+</html>
