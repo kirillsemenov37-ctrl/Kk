@@ -1,102 +1,35 @@
-using System;
-
-/// <summary>
-/// Интерфейс генератора случайных чисел
-/// </summary>
-public interface IRandomGenerator
+class Graph
 {
-    int Next();
-    int Next(int max);
-    int Next(int min, int max);
-    double NextDouble();
-    void NextBytes(byte[] buffer);
-}
+    Dictionary<int, List<int>> d;
 
-/// <summary>
-/// Реализация LCM генератора
-/// </summary>
-public class LcgRandom : IRandomGenerator
-{
-    private uint _state;
-    private const uint Multiplier = 1664525;
-    private const uint Increment = 1013904223;
-    
-    public LcgRandom(int seed)
+    public Graph()
     {
-        _state = (uint)seed;
+        d = new Dictionary<int, List<int>>();
     }
-    
-    public LcgRandom() : this((int)DateTime.Now.Ticks) { }
-    
-    private uint NextRaw()
+
+    public void AddVertex(int vertex)
     {
-        _state = Multiplier * _state + Increment;
-        return _state;
-    }
-    
-    public int Next()
-    {
-        return (int)(NextRaw() & 0x7FFFFFFF); // Обеспечиваем положительное число
-    }
-    
-    public int Next(int max)
-    {
-        if (max <= 0) throw new ArgumentException("max must be > 0");
-        return Next() % max;
-    }
-    
-    public int Next(int min, int max)
-    {
-        if (min >= max) throw new ArgumentException("min must be < max");
-        return min + Next(max - min);
-    }
-    
-    public double NextDouble()
-    {
-        return NextRaw() / (double)uint.MaxValue;
-    }
-    
-    public void NextBytes(byte[] buffer)
-    {
-        for (int i = 0; i < buffer.Length; i++)
+        if (!d.ContainsKey(vertex))
         {
-            buffer[i] = (byte)(NextRaw() & 0xFF);
+            d[vertex] = new List<int>();
         }
     }
-}
 
-/// <summary>
-/// Оборачивающий класс для стандартного Random (адаптер)
-/// </summary>
-public class StandardRandomAdapter : IRandomGenerator
-{
-    private Random _random;
-    
-    public StandardRandomAdapter() => _random = new Random();
-    public StandardRandomAdapter(int seed) => _random = new Random(seed);
-    
-    public int Next() => _random.Next();
-    public int Next(int max) => _random.Next(max);
-    public int Next(int min, int max) => _random.Next(min, max);
-    public double NextDouble() => _random.NextDouble();
-    public void NextBytes(byte[] buffer) => _random.NextBytes(buffer);
-}
-
-class Program
-{
-    static void Main()
+    public void Add(int v1, int v2)
     {
-        // Используем наш генератор через интерфейс
-        IRandomGenerator rng = new LcgRandom(42);
-        
-        Console.WriteLine("=== Тестирование LCG генератора ===");
-        Console.WriteLine($"Next(): {rng.Next()}");
-        Console.WriteLine($"Next(100): {rng.Next(100)}");
-        Console.WriteLine($"Next(10, 20): {rng.Next(10, 20)}");
-        Console.WriteLine($"NextDouble(): {rng.NextDouble():F6}");
-        
-        byte[] bytes = new byte[4];
-        rng.NextBytes(bytes);
-        Console.WriteLine($"NextBytes(): {BitConverter.ToString(bytes)}");
+        AddVertex(v1);
+        AddVertex(v2);
+
+        d[v1].Add(v2);
+        d[v2].Add(v1);
+    }
+
+    public void Print()
+    {
+        foreach (var vertex in d)
+        {
+            Console.Write("Вершина: " + vertex.Key);
+            Console.WriteLine(vertex.Value);
+        }
     }
 }
